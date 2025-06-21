@@ -5,7 +5,6 @@ const prisma = require("../prismaclient");
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
-  console.log("✅ SIGNUP route hit");
   const { email, password } = req.body;
   const hash = await bcrypt.hash(password, 10);
 
