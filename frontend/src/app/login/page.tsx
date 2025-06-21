@@ -2,6 +2,20 @@
 import { useState } from "react";
 import Link from "next/link";
 
+//  window.chrome
+declare global {
+  interface Window {
+    chrome?: {
+      runtime?: {
+        sendMessage?: (
+          message: unknown,
+          callback?: (response: unknown) => void
+        ) => void;
+      };
+    };
+  }
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +31,15 @@ export default function LoginPage() {
     const data = await res.json();
     if (data.token) {
       localStorage.setItem("token", data.token);
+      // ✅ Send token to extension
+      if (window.chrome?.runtime?.sendMessage) {
+        window.chrome.runtime.sendMessage(
+          { setToken: data.token }, //  special message type
+          (response: unknown) => {
+            console.log("Extension received token:", response);
+          }
+        );
+      }
       alert("Login successful!");
       window.location.href = "/dashboard";
     } else {
