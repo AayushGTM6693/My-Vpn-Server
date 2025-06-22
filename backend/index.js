@@ -5,16 +5,24 @@ require("dotenv").config();
 const app = express();
 
 // Allow only Vercel frontend
-const allowedOrigins = ["https://my-vpn-server.vercel.app"];
+const allowedOrigins = [
+  "https://my-vpn-server.vercel.app",
+  "chrome-extension://cciehfpkidobfcoalglefgajcepallkb",
+];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // optional: only needed if you're sending cookies
+    credentials: true,
   })
 );
-
 app.use(express.json());
 
 const authRoutes = require("./routes/auth.js");
