@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
 import Link from "next/link";
@@ -8,13 +9,17 @@ declare global {
     chrome?: {
       runtime?: {
         sendMessage?: (
-          message: unknown,
-          callback?: (response: unknown) => void
+          extensionId: string,
+          message: any,
+          options?: any,
+          callback?: (response: any) => void
         ) => void;
       };
     };
   }
 }
+
+const ExtensionId = "cciehfpkidobfcoalglefgajcepallkb";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,13 +36,12 @@ export default function LoginPage() {
     const data = await res.json();
     if (data.token) {
       localStorage.setItem("token", data.token);
+
       // ✅ Send token to extension
       if (window.chrome?.runtime?.sendMessage) {
         window.chrome.runtime.sendMessage(
-          { setToken: data.token }, //  special message type
-          (response: unknown) => {
-            console.log("Extension received token:", response);
-          }
+          ExtensionId, // ✅ REQUIRED when calling from webpage
+          { setToken: data.token }
         );
       }
       alert("Login successful!");
