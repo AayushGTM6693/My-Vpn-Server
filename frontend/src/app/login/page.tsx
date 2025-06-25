@@ -1,56 +1,60 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
 import Link from "next/link";
 
-//  window.chrome
-declare global {
-  interface Window {
-    chrome?: {
-      runtime?: {
-        sendMessage?: (
-          extensionId: string,
-          message: any,
-          options?: any,
-          callback?: (response: any) => void
-        ) => void;
-      };
-    };
-  }
-}
+declare const chrome: {
+  runtime?: {
+    sendMessage?: (
+      extensionId: string,
+      message: unknown,
+      options?: object,
+      callback?: (response: unknown) => void
+    ) => void;
+  };
+};
 
 const ExtensionId = "cciehfpkidobfcoalglefgajcepallkb";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
+    setLoading(true);
 
-    const data = await res.json();
-    if (data.token) {
-      localStorage.setItem("token", data.token);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
-      // ✅ Send token to extension
-      if (window.chrome?.runtime?.sendMessage) {
-        window.chrome.runtime.sendMessage(
-          ExtensionId, // ✅ REQUIRED when calling from webpage
-          { setToken: data.token }
-        );
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+
+        if (chrome?.runtime?.sendMessage) {
+          chrome.runtime.sendMessage(
+            ExtensionId,
+            { setToken: data.token },
+            () => {}
+          );
+        }
+
+        alert("Login successful!");
+        window.location.href = "/dashboard";
+      } else {
+        alert(data.error || "Login failed");
       }
-      alert("Login successful!");
-      window.location.href = "/dashboard";
-    } else {
-      alert(data.error || "Login failed");
+    } catch {
+      alert("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,25 +65,39 @@ export default function LoginPage() {
         className="space-y-4 p-6 bg-gray-800 rounded shadow-md w-96"
       >
         <h2 className="text-2xl font-bold">Login</h2>
+
+        {loading && (
+          <div className="text-center text-sm text-blue-400 animate-pulse">
+            🔄 Logging in... Please wait a few seconds...
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="Email"
-          className="w-full p-2 rounded border border-gray-600 bg-gray-900 focus:outline-none focus:border-blue-400"
+          className="w-full p-2 rounded border border-gray-600 bg-gray-900"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
         />
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-2 rounded border border-gray-600 bg-gray-900 focus:outline-none focus:border-blue-400"
+          className="w-full p-2 rounded border border-gray-600 bg-gray-900"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={loading}
         />
         <button
           type="submit"
-          className="bg-green-500 w-full p-2 rounded hover:bg-green-600 cursor-pointer"
+          className={`w-full p-2 rounded ${
+            loading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
+          }`}
+          disabled={loading}
         >
-          Log In
+          {loading ? "Processing..." : "Log In"}
         </button>
         <div className="text-center pt-2">
           <span className="text-gray-400">Dont have an account? </span>
