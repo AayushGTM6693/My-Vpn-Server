@@ -23,6 +23,9 @@ export default function SignupPage() {
 
       const data = await res.json();
       alert(data.message || data.error || "Unknown response");
+      if (data.message) {
+        window.location.href = "/login";
+      }
     } catch (error) {
       console.error("Signup error:", error);
       alert("Signup failed. Please try again.");

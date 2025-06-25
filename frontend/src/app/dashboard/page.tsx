@@ -20,7 +20,7 @@ export default function DashboardPage() {
 
         <div className="flex flex-col space-y-4">
           <Link
-            href="https://chrome.google.com/webstore/"
+            href="https://github.com/AayushGTM6693/myvpn"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block text-center bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded transition"
@@ -32,7 +32,7 @@ export default function DashboardPage() {
             href="/"
             className="inline-block text-center border border-gray-600 hover:bg-gray-800 text-gray-300 font-medium py-3 rounded transition"
           >
-            🔙 Back to Home
+            If You Have Already Added to the chrome. You can connect Now.
           </Link>
         </div>
       </section>
