@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
         <h2 className="text-xl font-semibold mt-6 mb-2">5. Contact</h2>
         <p className="mb-4">
           If you have any questions about this privacy policy, you can reach out
-          to us at <strong>support@mysingaporevpn.com</strong> (or your email).
+          to us at <strong>professional.coding6693@gmail.com</strong>
         </p>
       </div>
     </div>
