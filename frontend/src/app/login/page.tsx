@@ -13,7 +13,7 @@ declare const chrome: {
   };
 };
 
-const ExtensionId = "cciehfpkidobfcoalglefgajcepallkb";
+const ExtensionId = "cglcikiepnjmobkmkcekchhncccjgahm";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
